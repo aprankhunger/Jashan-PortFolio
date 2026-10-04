@@ -37,12 +37,27 @@ function createCard(filename, category) {
     el.className = `portfolio-item ${category} reveal-scroll`;
     el.setAttribute('data-category', category);
 
-    const folder = category === 'thumbnail' ? 'thumbnails' : 'videos';
+    let folder = '';
+    let categoryName = '';
+    
+    if (category === 'longForm') {
+        folder = 'Long form';
+        categoryName = 'LONG FORM';
+    } else if (category === 'shortsReels') {
+        folder = 'Shorts-reels';
+        categoryName = 'SHORTS/REELS';
+    } else if (category === 'graphicDesign') {
+        folder = 'Graphic design';
+        categoryName = 'GRAPHIC DESIGN';
+    }
+
     const src = `${folder}/${encodeURIComponent(filename)}`;
     const title = titleFromFilename(filename);
 
+    const isVideo = /\.(mp4|mov|webm|mkv)$/i.test(filename);
+    
     let mediaHtml;
-    if (category === 'short') {
+    if (isVideo) {
         mediaHtml = `<video autoplay loop muted playsinline src="${src}"></video>`;
     } else {
         mediaHtml = `<img src="${src}" alt="${title}" loading="lazy">`;
@@ -53,7 +68,7 @@ function createCard(filename, category) {
             ${mediaHtml}
         </div>
         <div class="item-info">
-            <span class="item-category">${category === 'short' ? 'SHORT VIDEO' : 'THUMBNAIL'}</span>
+            <span class="item-category">${categoryName}</span>
             <h3 class="item-title">${title}</h3>
         </div>
     `;
@@ -71,13 +86,23 @@ async function loadPortfolio() {
 
         if (loader) loader.remove();
 
-        data.thumbnails.forEach(file => {
-            grid.appendChild(createCard(file, 'thumbnail'));
-        });
+        if (data.longForm) {
+            data.longForm.forEach(file => {
+                grid.appendChild(createCard(file, 'longForm'));
+            });
+        }
 
-        data.videos.forEach(file => {
-            grid.appendChild(createCard(file, 'short'));
-        });
+        if (data.shortsReels) {
+            data.shortsReels.forEach(file => {
+                grid.appendChild(createCard(file, 'shortsReels'));
+            });
+        }
+
+        if (data.graphicDesign) {
+            data.graphicDesign.forEach(file => {
+                grid.appendChild(createCard(file, 'graphicDesign'));
+            });
+        }
 
         // Initialize all interactions
         initScrollAnimations();
